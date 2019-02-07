@@ -1,12 +1,12 @@
 package com.kk.qiitaclient.kotlinstartbookapp.qiitaclient.view
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.kk.qiitaclient.kotlinstartbookapp.qiitaclient.R
 import com.kk.qiitaclient.kotlinstartbookapp.qiitaclient.bindView
 import com.kk.qiitaclient.kotlinstartbookapp.qiitaclient.model.Article
@@ -40,10 +40,9 @@ class ArticleView: FrameLayout {
      * @param article 記事情報をつめたデータクラス
      */
     fun setArticle(article: Article) {
-        titleTextView?.text = article.title
-        userNameTextView?.text = article.user.name
-
-        // TODO プロフィール画像セット
-        profileImageView.setBackgroundColor(Color.RED)
+        titleTextView.text = article.title
+        userNameTextView.text = article.user.name
+        // Glideによって画像URLからImageViewに貼り付ける
+        Glide.with(context).load(article.user.profileImageUrl).into(profileImageView)
     }
 }
