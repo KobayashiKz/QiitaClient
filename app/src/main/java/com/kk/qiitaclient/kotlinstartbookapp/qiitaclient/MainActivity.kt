@@ -18,6 +18,12 @@ class MainActivity : AppCompatActivity() {
 
         val listView: ListView = findViewById<ListView>(R.id.list_view)
         listView.adapter = listAdapter
+        // ラムダ式
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val article = listAdapter.articles[position]
+            // 拡張関数letを入れて画面遷移処理
+            startActivity(ArticleActivity.intent(this, article))
+        }
     }
 
     /**
