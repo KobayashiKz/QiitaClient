@@ -1,20 +1,25 @@
 package com.kk.qiitaclient.kotlinstartbookapp.qiitaclient
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.kk.qiitaclient.kotlinstartbookapp.qiitaclient.client.ArticleClient
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity
+import com.trello.rxlifecycle.kotlin.bindToLifecycle
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
-class MainActivity : AppCompatActivity() {
+// RxAndroidを使用する上で、Activityのライフサイクルを考慮しないといけない
+// Activityが破棄されることでメモリリークやエラーが発生する場合も
+// RxLifecycle: ライフサイクルの面倒を見てくれるライブラリ
+// RxAppCompatActivityを継承する
+class MainActivity : RxAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +65,8 @@ class MainActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 // コールバック処理がメインスレッドで動く
                 .observeOn(AndroidSchedulers.mainThread())
+                // Observableに対する拡張関数でライフサイクルを考慮した挙動を
+                .bindToLifecycle(this)
                 // 結果の受け取りコールバックをラムダ式で渡している
                 .subscribe({
                     queryEditText.text.clear()
