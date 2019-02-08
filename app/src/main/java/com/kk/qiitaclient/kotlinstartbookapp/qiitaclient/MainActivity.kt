@@ -1,9 +1,11 @@
 package com.kk.qiitaclient.kotlinstartbookapp.qiitaclient
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ListView
+import android.widget.ProgressBar
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.kk.qiitaclient.kotlinstartbookapp.qiitaclient.client.ArticleClient
@@ -25,9 +27,12 @@ class MainActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val listAdapter = ArticleListAdapter(applicationContext)
-
         val listView: ListView = findViewById<ListView>(R.id.list_view)
+        val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
+        val queryEditText = findViewById<EditText>(R.id.query_edit_text)
+        val searchButton = findViewById<Button>(R.id.search_button)
+
+        val listAdapter = ArticleListAdapter(applicationContext)
         listView.adapter = listAdapter
         // ラムダ式
         listView.setOnItemClickListener { parent, view, position, id ->
@@ -51,20 +56,20 @@ class MainActivity : RxAppCompatActivity() {
             .build()
         val articleClient = retrofit.create(ArticleClient::class.java)
 
-
-        // 検索テキストフィールド
-        val queryEditText = findViewById<EditText>(R.id.query_edit_text)
-        // 検索ボタン
-        val searchButton = findViewById<Button>(R.id.search_button)
-
         // 検索ボタンタップしたらRxAndroidにより非同期でコールバックをメインスレッドで受け取る
         searchButton.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
+
             // クエリ名を指定してObservable<List<Article>>を取得する
             articleClient.search(queryEditText.text.toString())
                 // 結果（ストリーム）の生成を行う部分を別スレッドで行うよう設定
                 .subscribeOn(Schedulers.io())
                 // コールバック処理がメインスレッドで動く
                 .observeOn(AndroidSchedulers.mainThread())
+                // ストリームが終端に近づいた時の処理
+                .doAfterTerminate {
+                    progressBar.visibility = View.GONE
+                }
                 // Observableに対する拡張関数でライフサイクルを考慮した挙動を
                 .bindToLifecycle(this)
                 // 結果の受け取りコールバックをラムダ式で渡している
