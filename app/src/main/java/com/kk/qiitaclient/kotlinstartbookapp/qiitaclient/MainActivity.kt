@@ -16,6 +16,7 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import javax.inject.Inject
 
 // RxAndroidを使用する上で、Activityのライフサイクルを考慮しないといけない
 // Activityが破棄されることでメモリリークやエラーが発生する場合も
@@ -23,8 +24,24 @@ import rx.schedulers.Schedulers
 // RxAppCompatActivityを継承する
 class MainActivity : RxAppCompatActivity() {
 
+    // Dagger2: DI(依存性注入)フレームワーク
+    // DI: コンポーネントの依存関係を外部から注入するテクニック
+    // コンポーネント間の依存関係を弱くすることで、変更に強くなりテストしやすくなる
+
+    // @Injectにより注入するプロパティを指定
+    // Dagger2により、ClientModuleやAppComponentで設定した依存性がこのプロパティにセットされる
+    // 委譲プロパティを使用しないプロパティは原則初期化が必要
+    // 今回のようにフレームワークなどによって自動的に初期化される場合は不要
+    @Inject
+    lateinit var articleClient: ArticleClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // inject()で注入を実行
+        // manifestの追加も忘れずに
+        (application as QiitaClientApp).component.inject(this)
+
         setContentView(R.layout.activity_main)
 
         val listView: ListView = findViewById<ListView>(R.id.list_view)
