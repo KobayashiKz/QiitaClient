@@ -40,6 +40,8 @@ class MainActivity : RxAppCompatActivity() {
 
         // inject()で注入を実行
         // manifestの追加も忘れずに
+        // 依存先を注入. 自身のActivityに依存する
+        // ApplicationComponent.inject(mainActivity)
         (application as QiitaClientApp).component.inject(this)
 
         setContentView(R.layout.activity_main)

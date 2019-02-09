@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
+    <!-- Injectするためにapplicationにnameを指定 -->
     <application
             android:name=".QiitaClientApp"
             android:allowBackup="true"
